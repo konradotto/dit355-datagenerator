@@ -19,6 +19,10 @@ class Coordinate:
             'latitude': latitude
         }
 
+    def to_tuple(self):
+        """Turns Coordinates into tuples (latitude, longitutde) """
+        return [self.coordinate['latitude'], self.coordinate['longitude']]
+
     def repr_json(self):
         """Creates a json representation of a Coordinate. Can be used recursively by """
         return dict(coordinate=self.coordinate)

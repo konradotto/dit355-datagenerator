@@ -9,6 +9,7 @@ import paho.mqtt.client as mqtt #import the client1
 import time
 from operator import itemgetter
 from datetime import datetime
+import geometric_operations
 
 BUS_FILE = path_utils.get_data_path().joinpath('bus_stops_gothenburg.geojson')
 
@@ -77,16 +78,16 @@ if __name__ == "__main__":
 
     client = mqtt.Client('random client')
 
-    brooker_address = '192.168.43.61'
-    client.connect(brooker_address)
+    # brooker_address = '192.168.43.61'
+    # client.connect(brooker_address)
 
     topic = "hello/world"
 
     while True:
         timestamp = TimeStamp(datetime.now(), datetime.now(), True)
         req = TravelRequest(picker.pick(), picker.pick(), timestamp)
-        client.publish(topic, req.to_json())
-        print(req.to_json())
+        # client.publish(topic, req.to_json())
+        print(geometric_operations.calc_distance(req.travelRequest['source'], req.travelRequest['destination']))
         time.sleep(1)
 
 
