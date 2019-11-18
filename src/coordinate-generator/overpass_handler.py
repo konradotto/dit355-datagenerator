@@ -2,9 +2,9 @@
 Script to handle data files produced with overpass.
 """
 import json
-from src.utils import path_utils
+from utils import path_utils
 import random
-from travel_request import TravelRequest, TimeStamp, Coordinate
+from .travel_request import TravelRequest, TimeStamp, Coordinate
 import paho.mqtt.client as mqtt #import the client1
 import time
 from operator import itemgetter
@@ -16,7 +16,7 @@ BUS_FILE = path_utils.get_data_path().joinpath('bus_stops_gothenburg.geojson')
 
 def load_geo_features(filename):
     """Opens a json-file containing a list of geo features and returns them as object."""
-    with open(filename) as f:
+    with open(filename, encoding='utf8') as f:
         geo_features: object = json.load(f)
         return geo_features
 
@@ -44,7 +44,7 @@ class OverpassHandler:
 
 
 class CoordinatePicker:
-
+    """Stores a set of coordinates and allows random picks from them."""
     def __init__(self, coordinates):
         self.coordinates = coordinates
 

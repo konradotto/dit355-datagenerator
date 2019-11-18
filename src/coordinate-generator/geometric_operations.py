@@ -1,4 +1,4 @@
-from travel_request import Coordinate
+from .travel_request import Coordinate
 import geopy.distance as dist
 
 
