@@ -4,6 +4,7 @@ from datetime import datetime
 
 class ComplexEncoder(json.JSONEncoder):
     """Json encoder for nested json"""
+
     def default(self, obj):
         if hasattr(obj, 'repr_json'):
             return obj.repr_json()
@@ -13,10 +14,11 @@ class ComplexEncoder(json.JSONEncoder):
 
 class Coordinate:
     """Defines the format for coordinates."""
-    def __init__(self, longitude, latitude):
+
+    def __init__(self, latitude, longitude):
         self.coordinate = {
-            'longitude': longitude,
-            'latitude': latitude
+            'latitude': latitude,
+            'longitude': longitude
         }
 
     def to_tuple(self):
@@ -32,32 +34,38 @@ class Coordinate:
         return json.dumps(self.coordinate)
 
 
-class TimeStamp:
+class Device:
+    def __init__(self, deviceId):
+        self.deviceId = str(deviceId)
 
-    def __init__(self, departure=datetime.now(), arrival=datetime.now(), has_departure=True):
-        self.departure = str(departure)
-        self.arrival = str(arrival)
+    def repr_json(self):
+        return dict(deviceId=self.deviceId)
+
+
+class TimeStamp:
+    def __init__(self, departure=datetime.now(), has_departure=True):
+        self.departure = str(departure.replace(second=0, microsecond=0))
         self.has_departure = has_departure
 
     def repr_json(self):
-        return dict(departure=self.departure, arrival=self.arrival, hasDeparture=self.has_departure)
+        return dict(departure=self.departure, hasDeparture=self.has_departure)
 
 
 class TravelRequest:
 
-    def __init__(self, source: Coordinate, destination: Coordinate, timestamp: TimeStamp):
+    def __init__(self,deviceId: Device, source: Coordinate, destination: Coordinate, timestamp: TimeStamp ):
         self.travelRequest = {
-            'source': source,
+            'DeviceId': deviceId,
+            'Origin': source,
             'destination': destination,
-            'timestamp': timestamp
+            'TimeOfDeparture': timestamp
         }
 
     def to_json(self):
-        return json.dumps(self.repr_json(), cls=ComplexEncoder)
+        return json.dumps(self.repr_json(), cls=ComplexEncoder, indent=4)
 
     def repr_json(self):
         return dict(travelRequest=self.travelRequest)
 
     def to_string(self):
         return self.travelRequest
-
