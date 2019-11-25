@@ -20,6 +20,11 @@ def shift_coordinate(coord_before: Coordinate, angle_rad, distance):
         warnings.warn("Please provide a positive angle (ideally between 0 and 2pi).")
         return coord_before
 
+    dist_x, dist_y = transform_angular_distance_to_cartesian(angle_rad, distance)
+
+    shifted_coordinate = Coordinate.offset(approximate_latitude(dist_y, coord_before),
+                                           approximate_longitude(dist_x, coord_before))
+
 
 def transform_angular_distance_to_cartesian(angle_rad, distance):
     """Function to transform a nautical angular distance to its Cartesian form.
@@ -31,3 +36,17 @@ def transform_angular_distance_to_cartesian(angle_rad, distance):
     dist_y = math.cos(angle_rad) * distance
 
     return dist_x, dist_y
+
+
+def approximate_longitude(desired_x_distance, location):
+    """Function to approximate the offset in degrees of longitude needed to get the desired x-distance."""
+
+    # TODO: Calculations to turn desired metrical offset into degrees at location
+    return desired_x_distance
+
+
+def approximate_latitude(desired_distance, location):
+    """Function to approximate the offset in degrees of latitude needed to get the desired x-distance."""
+
+    # TODO: Calculations to turn desired metrical offset into degrees at location
+    return desired_distance
