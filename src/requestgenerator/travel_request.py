@@ -21,6 +21,10 @@ class Coordinate:
             'longitude': longitude
         }
 
+    def offset(self, d_latitude, d_longitude):
+        self.coordinate['latitude'] += d_latitude
+        self.coordinate['longitude'] += d_longitude
+
     def to_tuple(self):
         """Turns Coordinates into tuples (latitude, longitutde) """
         return [self.coordinate['latitude'], self.coordinate['longitude']]
