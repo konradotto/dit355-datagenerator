@@ -88,6 +88,7 @@ if __name__ == "__main__":
         deviceId = 'My PC'
         req = TravelRequest(deviceId, picker.pick(), picker.pick(), timestamp)
 
+        print(req.to_json())
         # client.publish(topic, req.to_json())
 
         print(geometric_operations.calc_distance(req.travelRequest['Origin'], req.travelRequest['destination']))

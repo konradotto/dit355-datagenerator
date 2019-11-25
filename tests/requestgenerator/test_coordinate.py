@@ -4,19 +4,19 @@ from travel_request import Coordinate
 
 class TestCoordinate(unittest.TestCase):
     def test_offset(self):
-        latitude = 52.5
         longitude = 13.2
-        test_coord = Coordinate(latitude, longitude)
+        latitude = 52.5
+        test_coord = Coordinate(longitude, latitude)
 
-        delta_lat = 2.1
         delta_long = -4.2
-        test_coord.offset(delta_lat, delta_long)
+        delta_lat = 2.1
+        test_coord.offset(delta_long, delta_lat)
 
-        expected_latitude = latitude + delta_lat
         expected_longitude = longitude + delta_long
+        expected_latitude = latitude + delta_lat
 
-        self.assertEqual(test_coord.coordinate['latitude'], expected_latitude)
         self.assertEqual(test_coord.coordinate['longitude'], expected_longitude)
+        self.assertEqual(test_coord.coordinate['latitude'], expected_latitude)
 
 
 if __name__ == '__main__':

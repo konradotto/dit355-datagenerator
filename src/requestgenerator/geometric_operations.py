@@ -24,8 +24,8 @@ def shift_coordinate(coord_before: Coordinate, angle_rad, distance):
 
     longitude_offset = approximate_longitude(dist_x, coord_before)
     latitude_offset = approximate_latitude(dist_y, coord_before)
-    
-    return Coordinate.clone(offset_lat=latitude_offset, offset_long=longitude_offset)
+
+    return Coordinate.clone(offset_long=longitude_offset, offset_lat=latitude_offset)
 
 
 def transform_angular_distance_to_cartesian(angle_rad, distance):
@@ -53,10 +53,10 @@ def approximate_longitude(desired_x_distance, location, longitude_scale_offset=0
     if scale_distance * 20.0 < desired_x_distance:
         return approximate_longitude(desired_x_distance, location, longitude_scale_offset * 10.0)
 
-    longitude_offset = longitude_scale_offset * (desired_x_distance / scale_distance)
+    longitude_offset = longitude_scale_offset * (desired_x_distance / scale_distance.m)
 
     # Calculate relative error of the approximation
-    approximation_error = math.fabs(calc_distance(location, location.clone(offset_long=longitude_offset)) - desired_x_distance) / desired_x_distance
+    approximation_error = math.fabs(calc_distance(location, location.clone(offset_long=longitude_offset)).m - desired_x_distance) / desired_x_distance
 
     return longitude_offset, approximation_error
 

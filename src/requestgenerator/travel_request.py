@@ -15,22 +15,22 @@ class ComplexEncoder(json.JSONEncoder):
 class Coordinate:
     """Defines the format for coordinates."""
 
-    def __init__(self, latitude, longitude):
+    def __init__(self, longitude, latitude):
         self.coordinate = {
-            'latitude': latitude,
-            'longitude': longitude
+            'longitude': longitude,
+            'latitude': latitude
         }
 
-    def offset(self, d_latitude, d_longitude):
-        self.coordinate['latitude'] += d_latitude
+    def offset(self, d_longitude, d_latitude):
         self.coordinate['longitude'] += d_longitude
+        self.coordinate['latitude'] += d_latitude
 
-    def clone(self, offset_lat=0, offset_long=0):
-        return Coordinate(self.coordinate['latitude'] + offset_lat, self.coordinate['longitude'] + offset_long)
+    def clone(self, offset_long=0, offset_lat=0):
+        return Coordinate(self.coordinate['longitude'] + offset_long, self.coordinate['latitude'] + offset_lat)
 
     def to_tuple(self):
-        """Turns Coordinates into tuples (latitude, longitutde) """
-        return [self.coordinate['latitude'], self.coordinate['longitude']]
+        """Turns Coordinates into tuples (longitude, latitude) """
+        return [self.coordinate['longitude'], self.coordinate['latitude']]
 
     def repr_json(self):
         """Creates a json representation of a Coordinate. Can be used recursively by """
