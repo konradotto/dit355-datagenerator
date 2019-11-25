@@ -21,13 +21,13 @@ def shift_coordinate(coord_before: Coordinate, angle_rad, distance):
         return coord_before
 
 
-def transform_angular_distance_to_cartesic(angle_rad, distance):
+def transform_angular_distance_to_cartesian(angle_rad, distance):
     """Function to transform a nautical angular distance to its Cartesian form.
 
     Beware that nautical distances are defined clockwise starting at North."""
 
     # Divide distance into longitudinal (dist_x) and latitudinal (dist_y) parts using trigonometric relations.
-    dist_x = math.asin(angle_rad) * distance
-    dist_y = math.acos(angle_rad) * distance
+    dist_x = math.sin(angle_rad) * distance
+    dist_y = math.cos(angle_rad) * distance
 
     return dist_x, dist_y
