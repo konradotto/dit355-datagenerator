@@ -4,7 +4,7 @@ Script to handle data files produced with overpass.
 import json
 from utils import path_utils
 import random
-from .travel_request import TravelRequest, TimeStamp, Coordinate
+from travel_request import TravelRequest, TimeStamp, Coordinate
 import paho.mqtt.client as mqtt #import the client1
 import time
 from operator import itemgetter
@@ -76,7 +76,7 @@ if __name__ == "__main__":
     picker = CoordinatePicker(op_handler.get_coordinates())
     print(picker.pick())
 
-    client = mqtt.Client('random client')
+    # client = mqtt.Client('random client')
 
     # brooker_address = '192.168.43.61'
     # client.connect(brooker_address)
