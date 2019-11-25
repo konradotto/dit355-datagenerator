@@ -25,6 +25,9 @@ class Coordinate:
         self.coordinate['latitude'] += d_latitude
         self.coordinate['longitude'] += d_longitude
 
+    def clone(self, offset_lat=0, offset_long=0):
+        return Coordinate(self.coordinate['latitude'] + offset_lat, self.coordinate['longitude'] + offset_long)
+
     def to_tuple(self):
         """Turns Coordinates into tuples (latitude, longitutde) """
         return [self.coordinate['latitude'], self.coordinate['longitude']]
