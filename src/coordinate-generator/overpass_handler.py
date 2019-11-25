@@ -2,9 +2,10 @@
 Script to handle data files produced with overpass.
 """
 import json
-from utils import path_utils
+import subprocess
+from src.utils import path_utils
 import random
-from travel_request import TravelRequest, TimeStamp, Coordinate
+from travel_request import TravelRequest, TimeStamp, Coordinate, Device
 import paho.mqtt.client as mqtt #import the client1
 import time
 from operator import itemgetter
@@ -16,7 +17,7 @@ BUS_FILE = path_utils.get_data_path().joinpath('bus_stops_gothenburg.geojson')
 
 def load_geo_features(filename):
     """Opens a json-file containing a list of geo features and returns them as object."""
-    with open(filename, encoding='utf8') as f:
+    with open(filename, encoding='utf-8') as f:
         geo_features: object = json.load(f)
         return geo_features
 
@@ -72,22 +73,22 @@ if __name__ == "__main__":
     print(max(bus_stop_coordinates, key=itemgetter(0))[0], min(bus_stop_coordinates, key=itemgetter(0))[0])
     print(max(bus_stop_coordinates, key=itemgetter(1))[1], min(bus_stop_coordinates, key=itemgetter(1))[1])
 
-
     picker = CoordinatePicker(op_handler.get_coordinates())
     print(picker.pick())
 
     # client = mqtt.Client('random client')
 
-    # brooker_address = '192.168.43.61'
-    # client.connect(brooker_address)
+    # broker_address = 'localhost'
+    # client.connect(broker_address)
 
     topic = "hello/world"
-
     while True:
-        timestamp = TimeStamp(datetime.now(), datetime.now(), True)
-        req = TravelRequest(picker.pick(), picker.pick(), timestamp)
+        timestamp = TimeStamp(datetime.now(), True)
+        # deviceId = Device(subprocess.check_output('wmic csproduct get UUID'))
+        deviceId = 'My PC'
+        req = TravelRequest(deviceId, picker.pick(), picker.pick(), timestamp)
+
         # client.publish(topic, req.to_json())
-        print(geometric_operations.calc_distance(req.travelRequest['source'], req.travelRequest['destination']))
+
+        print(geometric_operations.calc_distance(req.travelRequest['Origin'], req.travelRequest['destination']))
         time.sleep(1)
-
-
