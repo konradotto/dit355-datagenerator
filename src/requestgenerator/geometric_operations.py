@@ -22,10 +22,10 @@ def shift_coordinate(coord_before: Coordinate, angle_rad, distance):
 
     dist_x, dist_y = transform_angular_distance_to_cartesian(angle_rad, distance)
 
-    longitude_offset = approximate_longitude(dist_x, coord_before)
     latitude_offset = approximate_latitude(dist_y, coord_before)
+    longitude_offset = approximate_longitude(dist_x, coord_before)
 
-    return Coordinate.clone(offset_long=longitude_offset, offset_lat=latitude_offset)
+    return Coordinate.clone(offset_lat=latitude_offset, offset_long=longitude_offset)
 
 
 def transform_angular_distance_to_cartesian(angle_rad, distance):
@@ -38,6 +38,13 @@ def transform_angular_distance_to_cartesian(angle_rad, distance):
     dist_y = math.cos(angle_rad) * distance
 
     return dist_x, dist_y
+
+
+def approximate_latitude(desired_distance, location):
+    """Function to approximate the offset in degrees of latitude needed to get the desired x-distance."""
+
+    # TODO: Calculations to turn desired metrical offset into degrees at location
+    return desired_distance
 
 
 def approximate_longitude(desired_x_distance, location, longitude_scale_offset=0.1):
@@ -61,8 +68,3 @@ def approximate_longitude(desired_x_distance, location, longitude_scale_offset=0
     return longitude_offset, approximation_error
 
 
-def approximate_latitude(desired_distance, location):
-    """Function to approximate the offset in degrees of latitude needed to get the desired x-distance."""
-
-    # TODO: Calculations to turn desired metrical offset into degrees at location
-    return desired_distance
