@@ -15,22 +15,22 @@ class ComplexEncoder(json.JSONEncoder):
 class Coordinate:
     """Defines the format for coordinates."""
 
-    def __init__(self, longitude, latitude):
+    def __init__(self, latitude, longitude):
         self.coordinate = {
-            'longitude': longitude,
-            'latitude': latitude
+            'latitude': latitude,
+            'longitude': longitude
         }
 
-    def offset(self, d_longitude, d_latitude):
-        self.coordinate['longitude'] += d_longitude
+    def offset(self, d_latitude, d_longitude):
         self.coordinate['latitude'] += d_latitude
+        self.coordinate['longitude'] += d_longitude
 
     def clone(self, offset_long=0, offset_lat=0):
-        return Coordinate(self.coordinate['longitude'] + offset_long, self.coordinate['latitude'] + offset_lat)
+        return Coordinate(self.coordinate['latitude'] + offset_long, self.coordinate['longitude'] + offset_lat)
 
     def to_tuple(self):
-        """Turns Coordinates into tuples (longitude, latitude) """
-        return [self.coordinate['longitude'], self.coordinate['latitude']]
+        """Turns Coordinates into tuples (latitude, longitutde) """
+        return [self.coordinate['latitude'], self.coordinate['longitude']]
 
     def repr_json(self):
         """Creates a json representation of a Coordinate. Can be used recursively by """
@@ -42,6 +42,7 @@ class Coordinate:
 
 
 class Device:
+
     def __init__(self, deviceId):
         self.deviceId = str(deviceId)
 
@@ -50,6 +51,7 @@ class Device:
 
 
 class TimeStamp:
+
     def __init__(self, departure=datetime.now(), has_departure=True):
         self.departure = str(departure.replace(second=0, microsecond=0))
         self.has_departure = has_departure
@@ -60,7 +62,7 @@ class TimeStamp:
 
 class TravelRequest:
 
-    def __init__(self,deviceId: Device, source: Coordinate, destination: Coordinate, timestamp: TimeStamp ):
+    def __init__(self, deviceId: Device, source: Coordinate, destination: Coordinate, timestamp: TimeStamp ):
         self.travelRequest = {
             'DeviceId': deviceId,
             'Origin': source,
