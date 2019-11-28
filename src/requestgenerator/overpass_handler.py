@@ -1,8 +1,8 @@
 """
 Script to handle data files produced with overpass.
 """
+import uuid
 import json
-import subprocess
 from src.utils import path_utils
 import random
 from travel_request import TravelRequest, TimeStamp, Coordinate, Device
@@ -20,7 +20,6 @@ def load_geo_features(filename):
     with open(filename, encoding='utf-8') as f:
         geo_features: object = json.load(f)
         return geo_features
-
 
 def extract_coordinate_list(feature_object):
     """Turn a json-object containing features into a list of their coordinates."""
@@ -45,7 +44,7 @@ class OverpassHandler:
 
 
 class CoordinatePicker:
-    """Stores a set of coordinates and allows random picks from them."""
+
     def __init__(self, coordinates):
         self.coordinates = coordinates
 
@@ -76,20 +75,20 @@ if __name__ == "__main__":
     picker = CoordinatePicker(op_handler.get_coordinates())
     print(picker.pick())
 
-    # client = mqtt.Client('random client')
+    client = mqtt.Client('random client')
 
-    # broker_address = 'localhost'
-    # client.connect(broker_address)
+    broker_address = 'localhost'
+    client.connect(broker_address)
 
     topic = "hello/world"
     while True:
         timestamp = TimeStamp(datetime.now(), True)
-        # deviceId = Device(subprocess.check_output('wmic csproduct get UUID'))
-        deviceId = 'My PC'
+        deviceId = Device(uuid.getnode())
         req = TravelRequest(deviceId, picker.pick(), picker.pick(), timestamp)
 
-        print(req.to_json())
-        # client.publish(topic, req.to_json())
+        client.publish(topic, req.to_json())
 
         print(geometric_operations.calc_distance(req.travelRequest['Origin'], req.travelRequest['destination']))
         time.sleep(1)
+
+
