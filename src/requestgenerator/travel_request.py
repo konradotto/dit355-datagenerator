@@ -44,7 +44,7 @@ class Coordinate:
 class Device:
 
     def __init__(self, deviceId):
-        self.deviceId = str(deviceId)
+        self.deviceId = int(deviceId)
 
     def repr_json(self):
         return dict(deviceId=self.deviceId)
