@@ -34,7 +34,8 @@ class Coordinate:
 
     def repr_json(self):
         """Creates a json representation of a Coordinate. Can be used recursively by """
-        return dict(coordinate=self.coordinate)
+        return dict(latitude=self.coordinate['latitude'], longitude=self.coordinate['longitude'])
+        # return dict(coordinate=self.coordinate)
 
     def to_json(self):
         """"""
@@ -64,17 +65,19 @@ class TravelRequest:
 
     def __init__(self, deviceId: Device, source: Coordinate, destination: Coordinate, timestamp: TimeStamp ):
         self.travelRequest = {
-            'DeviceId': deviceId,
-            'Origin': source,
+            'deviceId': deviceId,
+            'requestId': 'TODO',
+            'origin': source,
             'destination': destination,
-            'TimeOfDeparture': timestamp
+            'timeOfDeparture': timestamp,
+            'purpose': 'TODO'
         }
 
     def to_json(self):
         return json.dumps(self.repr_json(), cls=ComplexEncoder, indent=4)
 
     def repr_json(self):
-        return dict(travelRequest=self.travelRequest)
+        return dict(**self.travelRequest)
 
     def to_string(self):
         return self.travelRequest

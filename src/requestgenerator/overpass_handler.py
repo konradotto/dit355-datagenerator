@@ -88,7 +88,8 @@ if __name__ == "__main__":
 
         client.publish(topic, req.to_json())
 
-        print(geometric_operations.calc_distance(req.travelRequest['Origin'], req.travelRequest['destination']))
+        # print(geometric_operations.calc_distance(req.travelRequest['Origin'], req.travelRequest['destination']))
+        print(req.to_json())
         time.sleep(1)
 
 
