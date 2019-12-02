@@ -3,7 +3,8 @@ Script to handle data files produced with overpass.
 """
 import uuid
 import json
-from src.utils import path_utils
+import importlib.util
+import os
 import random
 from travel_request import TravelRequest, TimeStamp, Coordinate, Device, Purpose
 import paho.mqtt.client as mqtt #import the client1
@@ -12,7 +13,7 @@ from operator import itemgetter
 from datetime import datetime
 import geometric_operations
 
-BUS_FILE = path_utils.get_data_path().joinpath('bus_stops_gothenburg.geojson')
+BUS_FILE = os.path.abspath('/Users/kardodastin/git/DIT355/dit355-project-datagenerator/data/bus_stops_gothenburg.geojson')
 
 
 def load_geo_features(filename):
