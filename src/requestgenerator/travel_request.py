@@ -35,7 +35,6 @@ class Coordinate:
     def repr_json(self):
         """Creates a json representation of a Coordinate. Can be used recursively by """
         return dict(latitude=self.coordinate['latitude'], longitude=self.coordinate['longitude'])
-        # return dict(coordinate=self.coordinate)
 
     def to_json(self):
         """"""
@@ -48,7 +47,7 @@ class Device:
         self.deviceId = int(deviceId)
 
     def repr_json(self):
-        return dict(deviceId=self.deviceId)
+        return self.deviceId
 
 
 class TimeStamp:
@@ -58,19 +57,31 @@ class TimeStamp:
         self.has_departure = has_departure
 
     def repr_json(self):
-        return dict(departure=self.departure, hasDeparture=self.has_departure)
+        return self.departure
+
+
+class Purpose:
+
+    purposes = ['work', 'leisure', 'school', 'tourism']
+    default_index = 0
+
+    def __init__(self, index=default_index):
+        self.purpose = self.purposes[index]
+
+    def repr_json(self):
+        return self.purpose
 
 
 class TravelRequest:
 
-    def __init__(self, deviceId: Device, source: Coordinate, destination: Coordinate, timestamp: TimeStamp ):
+    def __init__(self, device_id: Device, source: Coordinate, destination: Coordinate, timestamp: TimeStamp, purpose: Purpose):
         self.travelRequest = {
-            'deviceId': deviceId,
+            'deviceId': device_id,
             'requestId': 'TODO',
             'origin': source,
             'destination': destination,
             'timeOfDeparture': timestamp,
-            'purpose': 'TODO'
+            'purpose': purpose
         }
 
     def to_json(self):

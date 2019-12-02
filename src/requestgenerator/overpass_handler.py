@@ -5,7 +5,7 @@ import uuid
 import json
 from src.utils import path_utils
 import random
-from travel_request import TravelRequest, TimeStamp, Coordinate, Device
+from travel_request import TravelRequest, TimeStamp, Coordinate, Device, Purpose
 import paho.mqtt.client as mqtt #import the client1
 import time
 from operator import itemgetter
@@ -50,7 +50,7 @@ class CoordinatePicker:
 
     def pick(self):
         coord = random.choice(self.coordinates)
-        return Coordinate(coord[0], coord[1])
+        return Coordinate(coord[1], coord[0])
 
 
 class RequestCreator:
@@ -84,7 +84,8 @@ if __name__ == "__main__":
     while True:
         timestamp = TimeStamp(datetime.now(), True)
         deviceId = Device(uuid.getnode())
-        req = TravelRequest(deviceId, picker.pick(), picker.pick(), timestamp)
+        purpose = Purpose()
+        req = TravelRequest(deviceId, picker.pick(), picker.pick(), timestamp, purpose)
 
         client.publish(topic, req.to_json())
 
