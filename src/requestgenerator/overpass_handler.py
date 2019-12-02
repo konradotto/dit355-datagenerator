@@ -5,12 +5,10 @@ import uuid
 import json
 from src.utils import path_utils
 import random
-from travel_request import TravelRequest, TimeStamp, Coordinate, Device, Purpose
+from src.requestgenerator.travel_request import TravelRequest, TimeStamp, Coordinate, Device, Purpose
 import paho.mqtt.client as mqtt # import the client
 import time
-from operator import itemgetter
 from datetime import datetime
-import geometric_operations
 
 BUS_FILE = path_utils.get_data_path().joinpath('bus_stops_gothenburg.geojson')
 
@@ -106,7 +104,7 @@ class RequestCreator:
         return TravelRequest(source, target, timestamp)
 
 
-if __name__ == "__main__":
+def run():
 
     # Create a coordinate picker for Gothenburg based on the location of bus stops in the city
     op_handler = OverpassHandler(BUS_FILE)
