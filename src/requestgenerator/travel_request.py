@@ -43,8 +43,8 @@ class Coordinate:
 
 class Device:
 
-    def __init__(self, deviceId):
-        self.deviceId = int(deviceId)
+    def __init__(self, device_id):
+        self.deviceId = int(device_id)
 
     def repr_json(self):
         return self.deviceId
@@ -62,11 +62,8 @@ class TimeStamp:
 
 class Purpose:
 
-    purposes = ['work', 'leisure', 'school', 'tourism']
-    default_index = 0
-
-    def __init__(self, index=default_index):
-        self.purpose = self.purposes[index]
+    def __init__(self, purpose):
+        self.purpose = purpose
 
     def repr_json(self):
         return self.purpose
@@ -74,10 +71,10 @@ class Purpose:
 
 class TravelRequest:
 
-    def __init__(self, device_id: Device, source: Coordinate, destination: Coordinate, timestamp: TimeStamp, purpose: Purpose):
+    def __init__(self, device_id: Device, request_id, source: Coordinate, destination: Coordinate, timestamp: TimeStamp, purpose: Purpose):
         self.travelRequest = {
             'deviceId': device_id,
-            'requestId': 'TODO',
+            'requestId': request_id,
             'origin': source,
             'destination': destination,
             'timeOfDeparture': timestamp,
