@@ -22,10 +22,10 @@ def shift_coordinate(coord_before: Coordinate, angle_rad, distance):
 
     dist_x, dist_y = transform_angular_distance_to_cartesian(angle_rad, distance)
 
-    latitude_offset = approximate_latitude(dist_y, coord_before)
-    longitude_offset = approximate_longitude(dist_x, coord_before)
+    latitude_offset, lat_error = approximate_latitude(dist_y, coord_before)
+    longitude_offset, long_error = approximate_longitude(dist_x, coord_before)
 
-    return Coordinate.clone(offset_lat=latitude_offset, offset_long=longitude_offset)
+    return coord_before.clone(offset_lat=latitude_offset, offset_long=longitude_offset)
 
 
 def transform_angular_distance_to_cartesian(angle_rad, distance):
@@ -40,31 +40,46 @@ def transform_angular_distance_to_cartesian(angle_rad, distance):
     return dist_x, dist_y
 
 
-def approximate_latitude(desired_distance, location):
+def approximate_latitude(desired_y_distance, location, latitude_scale_offset=0.01):
     """Function to approximate the offset in degrees of latitude needed to get the desired x-distance."""
 
-    # TODO: Calculations to turn desired metrical offset into degrees at location
-    return desired_distance
+    scale_distance = calc_distance(location, location.clone(offset_lat=latitude_scale_offset)).m
+
+    # If scale distance is way bigger than desired distance, try again with new scale offset
+    if scale_distance / 10.0 > math.fabs(desired_y_distance):
+        return approximate_latitude(desired_y_distance, location, latitude_scale_offset / 10.0)
+
+    # If scale distance is way smaller than desired distance, try again with new scale offset
+    if scale_distance * 10.0 < math.fabs(desired_y_distance):
+        return approximate_latitude(desired_y_distance, location, latitude_scale_offset * 10.0)
+
+    latitude_offset = latitude_scale_offset * (desired_y_distance / scale_distance)
+
+    # Calculate relative error of the approximation
+    approximation_error = math.fabs(calc_distance(location, location.clone(offset_lat=latitude_offset)).m
+                                    - desired_y_distance) / desired_y_distance
+
+    return latitude_offset, approximation_error
 
 
 def approximate_longitude(desired_x_distance, location, longitude_scale_offset=0.1):
     """Function to approximate the offset in degrees of longitude needed to get the desired x-distance."""
 
-    scale_distance = calc_distance(location, location.clone(offset_long=longitude_scale_offset))
+    scale_distance = calc_distance(location, location.clone(offset_long=longitude_scale_offset)).m
 
     # If scale distance is way bigger than desired distance, try again with new scale offset
-    if scale_distance/10.0 > desired_x_distance:
+    if scale_distance / 10.0 > math.fabs(desired_x_distance):
         return approximate_longitude(desired_x_distance, location, longitude_scale_offset / 10.0)
 
     # If scale distance is way smaller than desired distance, try again with new scale offset
-    if scale_distance * 20.0 < desired_x_distance:
+    if scale_distance * 10.0 < math.fabs(desired_x_distance):
         return approximate_longitude(desired_x_distance, location, longitude_scale_offset * 10.0)
 
-    longitude_offset = longitude_scale_offset * (desired_x_distance / scale_distance.m)
+
+    longitude_offset = longitude_scale_offset * (desired_x_distance / scale_distance)
 
     # Calculate relative error of the approximation
-    approximation_error = math.fabs(calc_distance(location, location.clone(offset_long=longitude_offset)).m - desired_x_distance) / desired_x_distance
+    approximation_error = math.fabs(calc_distance(location, location.clone(offset_long=longitude_offset)).m
+                                    - desired_x_distance) / desired_x_distance
 
     return longitude_offset, approximation_error
-
-

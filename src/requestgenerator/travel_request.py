@@ -69,16 +69,26 @@ class Purpose:
         return self.purpose
 
 
+class TransportationType:
+
+    def __init__(self, type):
+        self.transportationType = type
+
+    def repr_json(self):
+        return self.purpose
+
+
 class TravelRequest:
 
-    def __init__(self, device_id: Device, request_id, source: Coordinate, destination: Coordinate, timestamp: TimeStamp, purpose: Purpose):
+    def __init__(self, device_id: Device, request_id, source: Coordinate, destination: Coordinate, timestamp: TimeStamp, purpose: Purpose, transportation_type: TransportationType):
         self.travelRequest = {
             'deviceId': device_id,
             'requestId': request_id,
             'origin': source,
             'destination': destination,
             'timeOfDeparture': timestamp,
-            'purpose': purpose
+            'purpose': purpose,
+            'transportationType': transportation_type
         }
 
     def to_json(self):
