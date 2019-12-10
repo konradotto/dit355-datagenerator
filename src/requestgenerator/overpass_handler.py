@@ -2,10 +2,11 @@
 Script to handle data files produced with overpass.
 """
 import uuid
+import calendar
 import json
 from src.utils import path_utils
 import random
-from src.requestgenerator.travel_request import TravelRequest, TimeStamp, Coordinate, Device, Purpose
+from src.requestgenerator.travel_request import TravelRequest, Issuance,TimeStamp, Coordinate, Device, Purpose
 from src.requestgenerator.geometric_operations import shift_coordinate
 import paho.mqtt.client as mqtt  # import the client
 import time
@@ -118,12 +119,13 @@ class RequestCreator:
     def create_random_request(self):
         device_id = self.device_picker.pick_random()
         request_id = self.id_tracker.next()
+        request_issuance = calendar.timegm(time.gmtime())
         request_source = self.coordinate_picker.pick_randomly_with_circular_uncertainty()
         request_target = self.coordinate_picker.pick_randomly_with_circular_uncertainty()
         request_timestamp = TimeStamp(datetime.now(), True)
         request_purpose = self.purpose_picker.pick_random()
         transportation_type = self.transportation_type_picker.pick_random()
-        return TravelRequest(device_id, request_id, request_source, request_target, request_timestamp, request_purpose,
+        return TravelRequest(device_id, request_id, request_issuance,request_source, request_target, request_timestamp, request_purpose,
                              transportation_type)
 
     def create_timed_request(self, timestamp):
@@ -131,6 +133,10 @@ class RequestCreator:
         target = self.picker.pick()
         return TravelRequest(source, target, timestamp)
 
+    def create_issuance_request(self, issuance):
+        source = self.picker.pick()
+        target = self.picker.pick()
+        return TravelRequest(source, target, issuance)
 
 def run():
     # Create a coordinate picker for Gothenburg based on the location of bus stops in the city
@@ -156,4 +162,4 @@ def run():
 
         print(req.to_json())
         print(req.travelRequest['requestId'])
-        time.sleep(0.1)
+        time.sleep(0.01)

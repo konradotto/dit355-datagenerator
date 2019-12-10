@@ -60,6 +60,16 @@ class TimeStamp:
         return self.departure
 
 
+class Issuance:
+
+    def __init__(self, departure=datetime.now()):
+        self.departure = str(departure.replace(second=0, microsecond=0))
+
+
+    def repr_json(self):
+        return self.departure
+
+
 class Purpose:
 
     def __init__(self, purpose):
@@ -80,10 +90,11 @@ class TransportationType:
 
 class TravelRequest:
 
-    def __init__(self, device_id: Device, request_id, source: Coordinate, destination: Coordinate, timestamp: TimeStamp, purpose: Purpose, transportation_type: TransportationType):
+    def __init__(self, device_id: Device, request_id, issuance: Issuance, source: Coordinate, destination: Coordinate, timestamp: TimeStamp, purpose: Purpose, transportation_type: TransportationType):
         self.travelRequest = {
             'deviceId': device_id,
             'requestId': request_id,
+            'issuance': issuance,
             'origin': source,
             'destination': destination,
             'timeOfDeparture': timestamp,
