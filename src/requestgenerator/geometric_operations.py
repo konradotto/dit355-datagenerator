@@ -75,7 +75,6 @@ def approximate_longitude(desired_x_distance, location, longitude_scale_offset=0
     if scale_distance * 10.0 < math.fabs(desired_x_distance):
         return approximate_longitude(desired_x_distance, location, longitude_scale_offset * 10.0)
 
-
     longitude_offset = longitude_scale_offset * (desired_x_distance / scale_distance)
 
     # Calculate relative error of the approximation
