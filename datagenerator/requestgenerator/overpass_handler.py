@@ -28,23 +28,26 @@ def load_geo_features(filename):
         return geo_features
 
 
-def extract_coordinate_list(feature_object):
+def extract_coordinate_list(feature_object, coord_limit=None):
     """Turn a json-object containing features into a list of their coordinates."""
     feature_list = feature_object['features']
     coordinate_list = [(feature['geometry']['coordinates']) for feature in feature_list]
+    if coord_limit is not None:
+        np.random.shuffle(coordinate_list)
+        coordinate_list = coordinate_list[:coord_limit]
     return coordinate_list
 
 
 class OverpassHandler:
 
-    def __init__(self, filename: str):
+    def __init__(self, filename: str, coord_limit=None):
         self.filename = filename
         self.coordinate_list = []
-        self.load_coordinate_list()
+        self.load_coordinate_list(coord_limit)
 
-    def load_coordinate_list(self):
+    def load_coordinate_list(self, coord_limit=None):
         """Directly extract the coordinates of features from a json-file."""
-        self.coordinate_list = extract_coordinate_list(load_geo_features(self.filename))
+        self.coordinate_list = extract_coordinate_list(load_geo_features(self.filename), coord_limit)
 
     def get_coordinates(self):
         return self.coordinate_list
@@ -168,8 +171,8 @@ class RequestCreator:
 def run(argv):
     # read the passed list of arguments into opts (names) and args (values)
     try:
-        opts, args = getopt.getopt(argv, 'i:b:t:c:d:ps:o:', ['ifile', 'broker', 'topic', 'client', 'device', 'print',
-                                                             'sleep', 'offset'])
+        opts, args = getopt.getopt(argv, 'i:b:t:c:d:ps:o:l:', ['ifile', 'broker', 'topic', 'client', 'device', 'print',
+                                                               'sleep', 'offset', 'limit'])
     except getopt.GetoptError as err:
         # print help information and exit:
         print(str(err))  # will print something like "option -a not recognized"
@@ -184,6 +187,7 @@ def run(argv):
     do_print = False
     sleep = 0.01
     offset = SHIFTING_DISTANCE
+    coord_limit = None
 
     # parse all command line options into variables
     for opt, arg in opts:
@@ -210,9 +214,14 @@ def run(argv):
                 offset = float(arg)
             except ValueError:
                 sys.exit("Offset distance argument [-o]/[--offset] must be float. Exit.")
+        elif opt in ('-l', '--limit'):
+            try:
+                coord_limit = int(arg)
+            except ValueError:
+                sys.exit("Seed limit argument [-l]/[--limit] must be an integer. Exit.")
 
     # Create a coordinate picker using a file containing coordinates as seeds
-    op_handler = OverpassHandler(filename)
+    op_handler = OverpassHandler(filename, coord_limit)
     coord_picker = CoordinatePicker(op_handler.get_coordinates())
     trans_type_picker = TransportationTypePicker(["tram", "ferry", "bus"], [0.2, 0.05, 0.75])
     purpose_picker = PurposePicker(p=[5, 3, 1, 1])
