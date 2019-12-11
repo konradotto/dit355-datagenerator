@@ -1,4 +1,4 @@
-from src.requestgenerator import overpass_handler
+from datagenerator.requestgenerator import overpass_handler
 import sys
 import argparse
 

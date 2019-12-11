@@ -4,10 +4,10 @@ Script to handle data files produced with overpass.
 import uuid
 import calendar
 import json
-from src.utils import path_utils
+from datagenerator.utils import path_utils
 import random
-from src.requestgenerator.travel_request import TravelRequest, Issuance, TimeStamp, Coordinate, Device, Purpose, TransportationType
-from src.requestgenerator.geometric_operations import shift_coordinate
+from datagenerator.requestgenerator.travel_request import TravelRequest, Issuance, TimeStamp, Coordinate, Device, Purpose, TransportationType
+from datagenerator.requestgenerator.geometric_operations import shift_coordinate
 import paho.mqtt.client as mqtt  # import the client
 import time
 import math
