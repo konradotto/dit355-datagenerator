@@ -6,7 +6,8 @@ import calendar
 import json
 from datagenerator.utils import path_utils
 import random
-from datagenerator.requestgenerator.travel_request import TravelRequest, Issuance, TimeStamp, Coordinate, Device, Purpose, TransportationType
+from datagenerator.requestgenerator.travel_request import TravelRequest, Issuance, TimeStamp, Coordinate, Device, \
+    Purpose, TransportationType
 from datagenerator.requestgenerator.geometric_operations import shift_coordinate
 import paho.mqtt.client as mqtt  # import the client
 import time
@@ -15,7 +16,6 @@ import numpy as np
 from datetime import datetime
 import getopt
 import sys
-
 
 BUS_FILE = path_utils.get_data_path().joinpath('bus_stops_gothenburg.geojson')
 SHIFTING_DISTANCE = 500  # meters of shifting distance
@@ -87,7 +87,6 @@ class IdTracker:
 
 
 class PurposePicker:
-
     purposes = [Purpose('work'), Purpose('leisure'), Purpose('school'), Purpose('tourism')]
 
     def __init__(self, purposes=None, p=None):
@@ -95,10 +94,10 @@ class PurposePicker:
             self.purposes = purposes
 
         if p is None or len(p) != len(self.purposes):
-            p = [1/len(self.purposes) for _ in self.purposes]
+            p = [1 / len(self.purposes) for _ in self.purposes]
 
         total_likelihood = sum(p)
-        self.borders = [likelihood/total_likelihood for likelihood in np.cumsum(p)]
+        self.borders = [likelihood / total_likelihood for likelihood in np.cumsum(p)]
 
     def pick_random(self):
         rand = np.random.uniform()
@@ -115,15 +114,14 @@ class DevicePicker:
 
 
 class TransportationTypePicker:
-
     transportation_types: TransportationType
 
     def __init__(self, types: TransportationType, p=None):
         if p is None or len(p) != len(types):
-            p = [1/len(types) for _ in types]
+            p = [1 / len(types) for _ in types]
         self.transportation_types = types
         total_likelihood = sum(p)
-        self.borders = [likelihood/total_likelihood for likelihood in np.cumsum(p)]
+        self.borders = [likelihood / total_likelihood for likelihood in np.cumsum(p)]
 
     def pick_random(self):
         rand = np.random.uniform()
@@ -232,6 +230,7 @@ def run(argv):
 
     # Set up topic to publish to using mqtt
     client = mqtt.Client(client_name)
+
     client.connect(broker_address)
 
     print('Publisher node has been started.')
@@ -240,10 +239,19 @@ def run(argv):
     print('Topic: \t\t', topic)
     print('Sleeping {} seconds between messages.'.format(sleep))
 
+    def on_disconnect(clients, userdata, rc):
+
+        if rc != 0:
+            print("Unexpected disconnection.")
+            print("trying to reconnect... ")
+
+    client.on_disconnect = on_disconnect
+
     while True:
         """Loop to continuously create and publish requests."""
         req = travel_request_creator.create_random_request(offset)
         client.publish(topic, req.to_json())
+        client.loop_start()
 
         if do_print:
             print(req.to_json())
