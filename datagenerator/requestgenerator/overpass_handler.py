@@ -63,12 +63,6 @@ class CoordinatePicker:
         coord = random.choice(self.coordinates)
         return Coordinate(coord[1], coord[0])
 
-    def print_all(self):
-        """Print all root coordinates."""
-        with open("coordinates.txt", "w+") as file:
-            for coord in self.coordinates:
-                file.write("{0} {1}\n".format(coord[1], coord[0]))
-
     def pick_randomly_with_circular_uncertainty(self, uncertainty_distance=SHIFTING_DISTANCE):
         """Pick a coordinate randomly and add uncertainty of upto <distance> meters to it."""
         # make distribution uniform over the area instead of the distance by squaring it
@@ -252,8 +246,6 @@ def run(argv):
             print("trying to reconnect... ")
 
     client.on_disconnect = on_disconnect
-
-    coord_picker.print_all()
 
     while True:
         """Loop to continuously create and publish requests."""
