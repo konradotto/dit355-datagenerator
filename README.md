@@ -9,9 +9,10 @@ The following sections will go deeper into the process for installation and usag
 
 ## Installation
 
-First of all, make sure to Python 3 is installed on your system.  
-* To install Python please visit [This website](https://www.python.org/downloads/) 
-### Python 3
+### Python 3.6+
+First of all you need to make sure to Python 3 is installed on your system.   
+
+**Check your Python Version:**
 
 In order to check whether Python 3 is installed already, go to your command line and run the following command:
 ```bash
@@ -27,9 +28,10 @@ If the result is Python 3.x.x you can either always use the command `python3` to
 
 If neither of these two commands returns Python 3.x.x, you probably need to install Python 3 before continuing with the next steps of the installation. If the release number is lower than 3.7, you should also consider updating your Python to a newer version.  
 
-
-The following link provides detailed instructions on how to do this:  
-[Python Installation Instructions](https://realpython.com/installing-python/)  
+**Install Python:**  
+* To install Python please download a recent version from the  
+[Official Python Download Page](https://www.python.org/downloads/)
+* Or consult these [Python Installation Instructions](https://realpython.com/installing-python/)  
 
 ## Usage
 
