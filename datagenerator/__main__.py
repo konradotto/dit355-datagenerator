@@ -4,6 +4,9 @@ import argparse
 
 
 if __name__ == "__main__":
+
+    # Define an argument parser and the options it takes
+    # Including the help options that will be printed when using <-h>
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--ifile', help='specify file to load coordinate-seeds from')
     parser.add_argument('-b', '--broker', help='specify ip address of the broker')
@@ -16,6 +19,7 @@ if __name__ == "__main__":
     parser.add_argument('-o', '--offset', help='set the uncertainty of coordinate seeds in meters [float]', type=float)
     parser.add_argument('-l', '--limit', help='limit the number of coordinate seeds used by this data generator',
                         type=int)
+    parser.add_argument('-f', '--filename', help='specify filename to save logs of the published messages to')
 
     parser.parse_args()
     overpass_handler.run(sys.argv[1:])
