@@ -190,8 +190,9 @@ class RequestCreator:
 def run(argv):
     # read the passed list of arguments into opts (names) and args (values)
     try:
-        opts, args = getopt.getopt(argv, 'i:b:t:c:d:ps:o:l:', ['ifile', 'broker', 'topic', 'client', 'device', 'print',
-                                                               'sleep', 'offset', 'limit'])
+        opts, args = getopt.getopt(argv, 'i:b:t:c:d:ps:o:l:f:',
+                                   ['ifile=', 'broker=', 'topic=', 'client=', 'device=', 'print',
+                                    'sleep=', 'offset=', 'limit=', 'filename=', 'days_offset='])
     except getopt.GetoptError as err:
         # print help information and exit:
         print(str(err))  # will print something like "option -a not recognized"
@@ -242,7 +243,7 @@ def run(argv):
                 sys.exit("Seed limit argument [-l]/[--limit] must be an integer. Exit.")
         elif opt in ('-f', '--filename'):
             save_filename = str(arg) + ".log"
-        elif opt == '--days_offset':
+        elif opt in '--days_offset':
             max_offset_days = float(arg)
 
     # Create a coordinate picker using a file containing coordinates as seeds
