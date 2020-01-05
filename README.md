@@ -3,7 +3,8 @@
 The datagenerator/emitter of group 9 is a tool to create public transport requests in the greater Gothenburg area.  
 By running the main script these requests are continuously published to a MQTT broker at a customizable rate.
 
-This module has been developed using python3. 
+This module has been developed using python3.  
+
 The following sections will go deeper into the process for installation and usage.
 
 ## Installation
@@ -15,6 +16,10 @@ The following sections will go deeper into the process for installation and usag
 The following packages are required:
 - Spaceholder A --version 1.2
 - Spaceholder B --version 1.0
+
+## Support
+
+If you have any questions regarding this specific module, please contact the lead developer of this module, [Konrad Otto](mailto:gusottko@student.gu.se), or the co-developer and maintainer [Armin Ghoroghi](arre2118@gmail.com).
 
 ## Authors and Acknowledgment
 
@@ -28,7 +33,5 @@ Clusterrot consists of the following members:
 - Kardo Marof
 - Jean Paul Massoud
 - Konrad Otto
-
-If you have any questions about this specific module, please contact our lead developer [Konrad Otto](mailto:gusottko@student.gu.se) on this part of the project.
 
 [//]: # (The structure of this file has been inspired by the suggestions on https://www.makeareadme.com/) 
