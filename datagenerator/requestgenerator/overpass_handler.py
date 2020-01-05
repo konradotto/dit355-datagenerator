@@ -38,6 +38,16 @@ def extract_coordinate_list(feature_object, coord_limit=None):
     return coordinate_list
 
 
+def create_empty_file(filename):
+    with open(filename, "w"):
+        pass
+
+
+def save_request(request: TravelRequest, filename):
+    with open(filename, "a") as file:
+        file.write(request.to_numbered_line() + "\n")
+
+
 class OverpassHandler:
 
     def __init__(self, filename: str, coord_limit=None):
@@ -177,11 +187,12 @@ def run(argv):
         sys.exit(2)
 
     # initialise variables that might be set from the cmd
-    filename = BUS_FILE
+    coordinate_filename = BUS_FILE
     broker_address = 'localhost'
     client_name = 'random client'
     topic = 'travel_requests'
     device = uuid.getnode()
+    save_filename = str(device) + ".log"
     do_print = False
     sleep = 0.01
     offset = SHIFTING_DISTANCE
@@ -190,7 +201,7 @@ def run(argv):
     # parse all command line options into variables
     for opt, arg in opts:
         if opt in ('-i', '--ifile'):
-            filename = arg
+            coordinate_filename = arg
         elif opt in ('-b', '--broker'):
             broker_address = arg
         elif opt in ('-t', '--topic'):
@@ -217,9 +228,11 @@ def run(argv):
                 coord_limit = int(arg)
             except ValueError:
                 sys.exit("Seed limit argument [-l]/[--limit] must be an integer. Exit.")
+        elif opt in ('-f', '--filename'):
+            save_filename = str(arg) + ".log"
 
     # Create a coordinate picker using a file containing coordinates as seeds
-    op_handler = OverpassHandler(filename, coord_limit)
+    op_handler = OverpassHandler(coordinate_filename, coord_limit)
     coord_picker = CoordinatePicker(op_handler.get_coordinates())
     trans_type_picker = TransportationTypePicker(["tram", "ferry", "bus"], [0.2, 0.05, 0.75])
     purpose_picker = PurposePicker(p=[5, 3, 1, 1])
@@ -230,14 +243,7 @@ def run(argv):
 
     # Set up topic to publish to using mqtt
     client = mqtt.Client(client_name)
-
     client.connect(broker_address)
-
-    print('Publisher node has been started.')
-    print('Publishing to client at: {}'.format(client_name))
-    print('Device: \t', device)
-    print('Topic: \t\t', topic)
-    print('Sleeping {} seconds between messages.'.format(sleep))
 
     def on_disconnect(clients, userdata, rc):
 
@@ -247,9 +253,20 @@ def run(argv):
 
     client.on_disconnect = on_disconnect
 
+    # Create empty file with desired filename
+    create_empty_file(save_filename)
+
+    # Print information before starting to loop
+    print('Publisher node has been started.')
+    print('Publishing to client at: {}'.format(client_name))
+    print('Device: \t', device)
+    print('Topic: \t\t', topic)
+    print('Sleeping {} seconds between messages.'.format(sleep))
+
     while True:
         """Loop to continuously create and publish requests."""
         req = travel_request_creator.create_random_request(offset)
+        save_request(req, save_filename)
         client.publish(topic, req.to_json())
         client.loop_start()
 
