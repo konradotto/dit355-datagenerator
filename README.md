@@ -10,7 +10,7 @@ The following sections will go deeper into the process for installation and usag
 ## Installation
 
 First of all, make sure to Python 3 is installed on your system.  
-
+* To install Python please visit [This website](https://www.python.org/downloads/) 
 ### Python 3
 
 In order to check whether Python 3 is installed already, go to your command line and run the following command:
