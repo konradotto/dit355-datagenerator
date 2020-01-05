@@ -2,9 +2,7 @@ from datagenerator.requestgenerator import overpass_handler
 import sys
 import argparse
 
-
 if __name__ == "__main__":
-
     # Define an argument parser and the options it takes
     # Including the help options that will be printed when using <-h>
     parser = argparse.ArgumentParser()
@@ -20,6 +18,9 @@ if __name__ == "__main__":
     parser.add_argument('-l', '--limit', help='limit the number of coordinate seeds used by this data generator',
                         type=int)
     parser.add_argument('-f', '--filename', help='specify filename to save logs of the published messages to')
+    parser.add_argument('--days_offset',
+                        help='set the number of days a request can be off the current date. Default=7 days.',
+                        type=float)
 
     parser.parse_args()
     overpass_handler.run(sys.argv[1:])

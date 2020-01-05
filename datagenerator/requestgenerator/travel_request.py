@@ -53,7 +53,7 @@ class Device:
 class TimeStamp:
 
     def __init__(self, departure=datetime.now(), has_departure=True):
-        self.departure = str(departure.replace(second=0, microsecond=0))
+        self.departure = str(departure.replace(microsecond=0))
         self.has_departure = has_departure
 
     def repr_json(self):

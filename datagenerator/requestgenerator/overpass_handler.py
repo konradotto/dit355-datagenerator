@@ -13,12 +13,13 @@ import paho.mqtt.client as mqtt  # import the client
 import time
 import math
 import numpy as np
-from datetime import datetime
+from datetime import datetime, timedelta
 import getopt
 import sys
 
 BUS_FILE = path_utils.get_data_path().joinpath('bus_stops_gothenburg.geojson')
 SHIFTING_DISTANCE = 500  # meters of shifting distance
+DEFAULT_OFFSET_DAYS = 7 # length of the interval in generated data
 
 
 def load_geo_features(filename):
@@ -46,6 +47,16 @@ def create_empty_file(filename):
 def save_request(request: TravelRequest, filename):
     with open(filename, "a") as file:
         file.write(request.to_numbered_line() + "\n")
+
+
+def create_random_datetime(max_offset_days: float, before_only: bool = False):
+    # do we only want to create random dates which are earlier than now()?
+    if before_only:
+        offset_days = random.uniform(0, max_offset_days)
+    else:
+        offset_days = random.uniform(-max_offset_days, max_offset_days)
+
+    return datetime.now() - timedelta(offset_days)
 
 
 class OverpassHandler:
@@ -153,13 +164,13 @@ class RequestCreator:
         self.purpose_picker = purpose_picker
         self.transportation_type_picker = type_picker
 
-    def create_random_request(self, uncertainty_distance=SHIFTING_DISTANCE):
+    def create_random_request(self, uncertainty_distance=SHIFTING_DISTANCE, max_offset_days=DEFAULT_OFFSET_DAYS):
         device_id = self.device_picker.pick_random()
         request_id = self.id_tracker.next()
         request_issuance = calendar.timegm(time.gmtime())
         request_source = self.coordinate_picker_source.pick_randomly_with_circular_uncertainty(uncertainty_distance)
         request_target = self.coordinate_picker_target.pick_randomly_with_circular_uncertainty(uncertainty_distance)
-        request_timestamp = TimeStamp(datetime.now(), True)
+        request_timestamp = TimeStamp(create_random_datetime(max_offset_days), True)
         request_purpose = self.purpose_picker.pick_random()
         transportation_type = self.transportation_type_picker.pick_random()
         return TravelRequest(device_id, request_id, request_issuance, request_source, request_target, request_timestamp,
@@ -196,6 +207,7 @@ def run(argv):
     do_print = False
     sleep = 0.01
     offset = SHIFTING_DISTANCE
+    max_offset_days = DEFAULT_OFFSET_DAYS
     coord_limit = None
 
     # parse all command line options into variables
@@ -230,6 +242,8 @@ def run(argv):
                 sys.exit("Seed limit argument [-l]/[--limit] must be an integer. Exit.")
         elif opt in ('-f', '--filename'):
             save_filename = str(arg) + ".log"
+        elif opt == '--days_offset':
+            max_offset_days = float(arg)
 
     # Create a coordinate picker using a file containing coordinates as seeds
     op_handler = OverpassHandler(coordinate_filename, coord_limit)
@@ -265,7 +279,7 @@ def run(argv):
 
     while True:
         """Loop to continuously create and publish requests."""
-        req = travel_request_creator.create_random_request(offset)
+        req = travel_request_creator.create_random_request(offset, max_offset_days)
         save_request(req, save_filename)
         client.publish(topic, req.to_json())
         client.loop_start()
