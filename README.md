@@ -15,12 +15,12 @@ First of all, make sure to Python 3 is installed on your system.
 
 In order to check whether Python 3 is installed already, go to your command line and run the following command:
 ```bash
-\# python --version
+python --version
 ```
 
 If the result is Python 2.x.x, Python 2 is your system standard. In this case you should check whether Python 3 is installed additionally:
 ```bash
-\# python3 --version
+python3 --version
 ```
 If the result is Python 3.x.x you can either always use the command `python3` to replace the simple `python`. Alternatively you could switch Python 3 to be your system default.  
 
