@@ -3,11 +3,33 @@
 The datagenerator/emitter of group 9 is a tool to create public transport requests in the greater Gothenburg area.  
 By running the main script these requests are continuously published to a MQTT broker at a customizable rate.
 
-This module has been developed using python3.  
+This module has been developed using Python 3.  
 
 The following sections will go deeper into the process for installation and usage.
 
 ## Installation
+
+First of all, make sure to Python 3 is installed on your system.  
+
+### Python 3
+
+In order to check whether Python 3 is installed already, go to your command line and run the following command:
+```bash
+\# python --version
+```
+
+If the result is Python 2.x.x, Python 2 is your system standard. In this case you should check whether Python 3 is installed additionally:
+```bash
+\# python3 --version
+```
+If the result is Python 3.x.x you can either always use the command `python3` to replace the simple `python`. Alternatively you could switch Python 3 to be your system default.  
+
+
+If neither of these two commands returns Python 3.x.x, you probably need to install Python 3 before continuing with the next steps of the installation. If the release number is lower than 3.7, you should also consider updating your Python to a newer version.  
+
+
+The following link provides detailed instructions on how to do this:  
+[Python Installation Instructions](https://realpython.com/installing-python/)  
 
 ## Usage
 
