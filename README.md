@@ -96,4 +96,9 @@ Clusterrot consists of the following members:
 - Jean Paul Massoud
 - Konrad Otto
 
+### Documentation
+
+* To access Diagrams and Documentaion please visit [Documentaion](https://git.chalmers.se/courses/dit355/2019/group-9/dit355-project-documentation)
+ 
+
 [//]: # (The structure of this file has been inspired by the suggestions on https://www.makeareadme.com/) 
