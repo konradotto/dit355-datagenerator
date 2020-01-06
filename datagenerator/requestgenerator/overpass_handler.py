@@ -22,6 +22,8 @@ from easygui import fileopenbox
 BUS_FILE = path_utils.get_data_path().joinpath('bus_stops_gothenburg.geojson')
 SHIFTING_DISTANCE = 500  # meters of shifting distance
 DEFAULT_OFFSET_DAYS = 7 # length of the interval in generated data
+disconnected = True
+last = -1
 
 
 def load_geo_features(filename):
@@ -189,6 +191,45 @@ class RequestCreator:
         return TravelRequest(source, target, issuance)
 
 
+def on_disconnect(clients, userdata, rc):
+    print("Unexpected disconnection.")
+    print("trying to reconnect... ")
+
+
+def on_connect(client, userdata, flags, rc):
+    print("Connected with result code {0}".format(str(rc)))
+
+
+def create_client(client_name, broker_address):
+    # Set up topic to publish to using mqtt
+    connected = False
+    client = mqtt.Client(client_name)
+    attempts = 5
+    while not connected:
+        try:
+            client.connect(broker_address)
+            connected = True
+        except ConnectionRefusedError as e:
+            print("Failed to create a client with following error:")
+            print(str(e))
+            print("\nMake sure that Mosquitto is up and running (restart potentially)")
+            attempts = attempts + 1
+            time.sleep(2)
+        finally:
+            if attempts > 10:
+                print("Unsuccesfully attempted to connect to Mosquitto {0} times.\n".format(attempts))
+                print("Check the error message printed above to fix the issue.")
+                print("The program terminates now.")
+
+                sys.exit("Failed to connect to Mosquitto.")
+
+    client.on_disconnect = on_disconnect
+    client.on_connect = on_connect
+    print("Connection to Mosquitto established successfully.\n")
+
+    return client
+
+
 def run(argv):
     # read the passed list of arguments into opts (names) and args (values)
     try:
@@ -258,17 +299,8 @@ def run(argv):
     travel_request_creator = RequestCreator(IdTracker(), [device], coord_picker, purpose_picker,
                                             trans_type_picker)
 
-    # Set up topic to publish to using mqtt
-    client = mqtt.Client(client_name)
-    client.connect(broker_address)
-
-    def on_disconnect(clients, userdata, rc):
-
-        if rc != 0:
-            print("Unexpected disconnection.")
-            print("trying to reconnect... ")
-
-    client.on_disconnect = on_disconnect
+    # Start client
+    client = create_client(client_name, broker_address)
 
     # Create empty file with desired filename
     create_empty_file(save_filename)
@@ -337,17 +369,7 @@ def resend_from_logfile():
         except ValueError:
             print("Please only enter integers.")
 
-    # Set up topic to publish to using mqtt
-    client = mqtt.Client(client_name)
-    client.connect(broker_address)
-
-    def on_disconnect(clients, userdata, rc):
-
-        if rc != 0:
-            print("Unexpected disconnection.")
-            print("trying to reconnect... ")
-
-    client.on_disconnect = on_disconnect
+    client = create_client(client_name, broker_address)
 
     with open(filename) as f:
         for i, line in enumerate(f):
@@ -358,6 +380,3 @@ def resend_from_logfile():
                 client.publish(topic, line)
                 client.loop_start()
                 time.sleep(0.1)
-
-
-
