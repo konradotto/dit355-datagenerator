@@ -16,6 +16,8 @@ import numpy as np
 from datetime import datetime, timedelta
 import getopt
 import sys
+import os
+from easygui import fileopenbox
 
 BUS_FILE = path_utils.get_data_path().joinpath('bus_stops_gothenburg.geojson')
 SHIFTING_DISTANCE = 500  # meters of shifting distance
@@ -290,3 +292,72 @@ def run(argv):
             print(req.travelRequest['requestId'])
 
         time.sleep(sleep)
+
+
+def resend_from_logfile():
+
+    broker_address = 'localhost'
+    client_name = 'random client'
+    topic = 'travel_requests'
+
+    print("Publisher node created.")
+    print("This publisher repeats travel requests logged during a previous session.\n")
+
+    # open a log file
+    filename = fileopenbox(default="*.log", filetypes=['*.log'])  # show an "Open" dialog box and return the path to the selected file
+    if filename is None or not filename.endswith(".log"):
+        sys.exit("Failed to open a .log file. Exiting the program at resend#1.\nGood Bye!")
+
+    lines = len(open(filename).readlines())
+    if lines < 1:
+        sys.exit("Logfile contains less than one entry. Nothing to do here.\n"
+                 "Exiting the program at resend#2.\nGood Bye!")
+
+    with open(filename) as f:
+        try:
+            first = int(f.readline().split("::", 1)[0])
+            last = int(f.read().splitlines()[-1].split("::", 1)[0])
+        except ValueError:
+            sys.exit("The entries in this logfile seem to have the wrong format.\n"
+                     "Exiting the program at resend#3.\nGood Bye!")
+
+    print("Logfile opened successfully. It seems to have {0} entries.\n"
+          "First one is #{1}, last one is #{2}.\n".format(lines, first, last))
+
+    bad_inputs = True
+
+    while bad_inputs:
+        try:
+            start = int(input("Enter the first entry you want to resend [{0}-{1}]: ".format(first, last)))
+            stop = int(input("Enter the last entry you want to resend (inclusive) [{0}-{1}]: ".format(start, last)))
+            if start < first or start > last or stop < start or stop > last:
+                print("Integers not within the given boundaries.\nTry again!\n")
+            else:
+                bad_inputs = False
+        except ValueError:
+            print("Please only enter integers.")
+
+    # Set up topic to publish to using mqtt
+    client = mqtt.Client(client_name)
+    client.connect(broker_address)
+
+    def on_disconnect(clients, userdata, rc):
+
+        if rc != 0:
+            print("Unexpected disconnection.")
+            print("trying to reconnect... ")
+
+    client.on_disconnect = on_disconnect
+
+    with open(filename) as f:
+        for i, line in enumerate(f):
+            if i in range(start-1, stop):
+                print(line)
+                line = line.replace('#*?', '\r').replace('#*!', '\n').split('::', 1)[1]  # reintroduce line breaks and split number away
+                line = os.linesep.join([s for s in line.splitlines() if s])  # remove empty lines
+                client.publish(topic, line)
+                client.loop_start()
+                time.sleep(0.1)
+
+
+

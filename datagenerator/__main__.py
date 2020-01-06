@@ -5,6 +5,7 @@ import argparse
 if __name__ == "__main__":
     # Define an argument parser and the options it takes
     # Including the help options that will be printed when using <-h>
+    arguments = sys.argv[1:]
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--ifile', help='specify file to load coordinate-seeds from')
     parser.add_argument('-b', '--broker', help='specify ip address of the broker')
@@ -19,8 +20,15 @@ if __name__ == "__main__":
                         type=int)
     parser.add_argument('-f', '--filename', help='specify filename to save logs of the published messages to')
     parser.add_argument('--days_offset',
-                        help='set the number of days a request can be off the current date. Default=7 days.',
+                        help='set the number of days a request can be off the current date. Default=7 days',
                         type=float)
+    parser.add_argument('-r', '--resend',
+                        help='Open a logfile and resend the requests stored in it instead of creating new ones',
+                        action='store_true')
 
     parser.parse_args()
-    overpass_handler.run(sys.argv[1:])
+
+    if ('-r' in arguments) or ('--resend' in arguments):
+        overpass_handler.resend_from_logfile()
+    else:
+        overpass_handler.run(arguments)
