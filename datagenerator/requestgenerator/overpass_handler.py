@@ -331,10 +331,39 @@ def run(argv):
         time.sleep(sleep)
 
 
-def resend_from_logfile():
+def resend_from_logfile(argv):
+    # read the passed list of arguments into opts (names) and args (values)
+    try:
+        opts, args = getopt.getopt(argv, 'i:b:t:c:d:ps:o:l:f:r',
+                                   ['ifile=', 'broker=', 'topic=', 'client=', 'device=', 'print',
+                                    'sleep=', 'offset=', 'limit=', 'filename=', 'days_offset=', 'resend'])
+    except getopt.GetoptError as err:
+        # print help information and exit:
+        print(str(err))  # will print something like "option -a not recognized"
+        sys.exit(2)
+
     broker_address = 'localhost'
     client_name = 'random client'
     topic = 'travel_requests'
+    do_print = False
+    sleep = 0.01
+
+    # parse all command line options into variables
+    for opt, arg in opts:
+        if opt in ('-b', '--broker'):
+            broker_address = arg
+        elif opt in ('-t', '--topic'):
+            topic = arg
+        elif opt in ('-c', '--client'):
+            client_name = arg
+        elif opt in ('-p', '--print'):
+            do_print = True
+            print('Printing mode activated.')
+        elif opt in ('-s', '--sleep'):
+            try:
+                sleep = float(arg)
+            except ValueError:
+                sys.exit("Sleep time argument [-s]/[--sleep] must be float. Exit.")
 
     print("Publisher node created.")
     print("This publisher repeats travel requests logged during a previous session.\n")
@@ -384,6 +413,10 @@ def resend_from_logfile():
                 line = line.split('::', 1)[1]  # split number away
                 line = os.linesep.join([s for s in line.splitlines() if s])  # remove empty lines
                 client.publish(topic, line)
-                last_id = i
+                last_id = i+1
                 client.loop_start()
-                time.sleep(0.1)
+
+                if do_print:
+                    print(line)
+
+                time.sleep(sleep)

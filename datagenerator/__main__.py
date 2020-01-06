@@ -29,6 +29,6 @@ if __name__ == "__main__":
     parser.parse_args()
 
     if ('-r' in arguments) or ('--resend' in arguments):
-        overpass_handler.resend_from_logfile()
+        overpass_handler.resend_from_logfile(arguments)
     else:
         overpass_handler.run(arguments)
