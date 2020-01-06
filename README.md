@@ -33,7 +33,41 @@ If neither of these two commands returns Python 3.x.x, you probably need to inst
 [Official Python Download Page](https://www.python.org/downloads/)
 * Or consult these [Python Installation Instructions](https://realpython.com/installing-python/)  
 
+**Install Python Dependencies:**  
+
+All non-standard Python dependencies for this project are listed in the file [requirements.txt](requirements.txt).
+The easiest way to install these dependencies is using pip or pip3 (depending on your systems default Python).
+Simply run the corresponding command from your commandline:
+```bash
+pip install -r requirements.txt
+pip3 install -r requirements.txt
+```
+If this command completes successfully, the correct versions of all necessary dependencies should be installed on your system.  
+
+**Install Tkinter:**  
+
+Tkinter is a Python framework for user interfaces. 
+If it is not installed with your standard python distribution, you might need to take some additional steps to install it.
+You can find install instructions for your OS in the [tkdocs](https://tkdocs.com/tutorial/install.html).  
+ 
+For instance it can be installed on Linux using your distribution's package manager:  
+
+```bash
+sudo apt-get install python3-tk
+```
+
+Now you should be able to execute the datagenerator without any problems.
+
 ## Usage
+
+There are a few things you can do with the datagenerator. 
+To run the script you ideally open a commandline in the top-level directory of this project. 
+From there you can simply run the project and pass parameters in the commands.  
+
+To get an idea of the available parameters, ask for help using the flag -h or --help:
+```bash
+python3 -m datagenerator --help
+```
 
 ## The data generator is written in Python
 
@@ -43,11 +77,15 @@ The following packages are required:
 
 ## Support
 
-If you have any questions regarding this specific module, please contact the lead developer of this module, [Konrad Otto](mailto:gusottko@student.gu.se), or the co-developer and maintainer [Armin Ghoroghi](arre2118@gmail.com).
+If you have any questions regarding this specific module,
+please contact the lead developer of this module, [Konrad Otto](mailto:gusottko@student.gu.se), 
+or the co-developer and maintainer, [Armin Ghoroghi](arre2118@gmail.com).
 
 ## Authors and Acknowledgment
 
-This module is part of the distributed system for Visual Transportation Support developed by Clusterrot (Group 9) during the course DIT355 Miniproject: Distributed Systems at the University of Gothenburg.
+This module is part of the distributed system for Visual Transportation Support 
+developed by Clusterrot (Group 9) during the course 
+DIT355 Miniproject: Distributed Systems at the University of Gothenburg.  
 The system was implemented from November 2019 through January 2020.  
 
 Clusterrot consists of the following members:
