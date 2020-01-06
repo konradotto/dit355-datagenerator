@@ -21,9 +21,9 @@ from easygui import fileopenbox
 
 BUS_FILE = path_utils.get_data_path().joinpath('bus_stops_gothenburg.geojson')
 SHIFTING_DISTANCE = 500  # meters of shifting distance
-DEFAULT_OFFSET_DAYS = 7 # length of the interval in generated data
+DEFAULT_OFFSET_DAYS = 7  # length of the interval in generated data
 disconnected = True
-last = -1
+last_id: int = -2
 
 
 def load_geo_features(filename):
@@ -193,11 +193,13 @@ class RequestCreator:
 
 def on_disconnect(clients, userdata, rc):
     print("Unexpected disconnection.")
+    print("Last requestId before loss of connection: #{0}".format(last_id))
     print("trying to reconnect... ")
 
 
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code {0}".format(str(rc)))
+    print("Last requestId before connection was established: #{0}".format(last_id))
 
 
 def create_client(client_name, broker_address):
@@ -312,11 +314,14 @@ def run(argv):
     print('Topic: \t\t', topic)
     print('Sleeping {} seconds between messages.'.format(sleep))
 
+    global last_id
+
     while True:
         """Loop to continuously create and publish requests."""
         req = travel_request_creator.create_random_request(offset, max_offset_days)
         save_request(req, save_filename)
         client.publish(topic, req.to_json())
+        last_id = req.get_id()
         client.loop_start()
 
         if do_print:
@@ -327,7 +332,6 @@ def run(argv):
 
 
 def resend_from_logfile():
-
     broker_address = 'localhost'
     client_name = 'random client'
     topic = 'travel_requests'
@@ -336,7 +340,8 @@ def resend_from_logfile():
     print("This publisher repeats travel requests logged during a previous session.\n")
 
     # open a log file
-    filename = fileopenbox(default="*.log", filetypes=['*.log'])  # show an "Open" dialog box and return the path to the selected file
+    filename = fileopenbox(default="*.log",
+                           filetypes=['*.log'])  # show an "Open" dialog box and return the path to the selected file
     if filename is None or not filename.endswith(".log"):
         sys.exit("Failed to open a .log file. Exiting the program at resend#1.\nGood Bye!")
 
@@ -371,12 +376,14 @@ def resend_from_logfile():
 
     client = create_client(client_name, broker_address)
 
+    global last_id
     with open(filename) as f:
         for i, line in enumerate(f):
-            if i in range(start-1, stop):
-                print(line)
-                line = line.replace('#*?', '\r').replace('#*!', '\n').split('::', 1)[1]  # reintroduce line breaks and split number away
+            if i in range(start - 1, stop):
+                line = line.replace('#*?', '\r').replace('#*!', '\n')  # reintroduce line breaks
+                line = line.split('::', 1)[1]  # split number away
                 line = os.linesep.join([s for s in line.splitlines() if s])  # remove empty lines
                 client.publish(topic, line)
+                last_id = i
                 client.loop_start()
                 time.sleep(0.1)

@@ -113,3 +113,6 @@ class TravelRequest:
 
     def to_numbered_line(self):
         return str(self.travelRequest['requestId']) + "::" + self.to_json().replace('\r', '#*?').replace('\n', '#*!')
+
+    def get_id(self):
+        return int(self.travelRequest['requestId'])
