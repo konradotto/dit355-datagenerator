@@ -22,6 +22,7 @@ from easygui import fileopenbox
 BUS_FILE = path_utils.get_data_path().joinpath('bus_stops_gothenburg.geojson')
 SHIFTING_DISTANCE = 500  # meters of shifting distance
 DEFAULT_OFFSET_DAYS = 7  # length of the interval in generated data
+DEFAULT_SHIFT_DAYS = 0.0  # don't shift the days unless specified
 disconnected = True
 last_id: int = -2
 
@@ -53,14 +54,14 @@ def save_request(request: TravelRequest, filename):
         file.write(request.to_numbered_line() + "\n")
 
 
-def create_random_datetime(max_offset_days: float, before_only: bool = False):
+def create_random_datetime(max_offset_days: float, shift_days: float, before_only: bool = False):
     # do we only want to create random dates which are earlier than now()?
     if before_only:
         offset_days = random.uniform(0, max_offset_days)
     else:
         offset_days = random.uniform(-max_offset_days, max_offset_days)
 
-    return datetime.now() - timedelta(offset_days)
+    return datetime.now() - timedelta(days=(offset_days + shift_days))
 
 
 class OverpassHandler:
@@ -168,13 +169,14 @@ class RequestCreator:
         self.purpose_picker = purpose_picker
         self.transportation_type_picker = type_picker
 
-    def create_random_request(self, uncertainty_distance=SHIFTING_DISTANCE, max_offset_days=DEFAULT_OFFSET_DAYS):
+    def create_random_request(self, uncertainty_distance=SHIFTING_DISTANCE, max_offset_days=DEFAULT_OFFSET_DAYS,
+                              shift=DEFAULT_SHIFT_DAYS):
         device_id = self.device_picker.pick_random()
         request_id = self.id_tracker.next()
         request_issuance = calendar.timegm(time.gmtime())
         request_source = self.coordinate_picker_source.pick_randomly_with_circular_uncertainty(uncertainty_distance)
         request_target = self.coordinate_picker_target.pick_randomly_with_circular_uncertainty(uncertainty_distance)
-        request_timestamp = TimeStamp(create_random_datetime(max_offset_days), True)
+        request_timestamp = TimeStamp(create_random_datetime(max_offset_days, shift, True))
         request_purpose = self.purpose_picker.pick_random()
         transportation_type = self.transportation_type_picker.pick_random()
         return TravelRequest(device_id, request_id, request_issuance, request_source, request_target, request_timestamp,
@@ -235,9 +237,9 @@ def create_client(client_name, broker_address):
 def run(argv):
     # read the passed list of arguments into opts (names) and args (values)
     try:
-        opts, args = getopt.getopt(argv, 'i:b:t:c:d:ps:o:l:f:',
+        opts, args = getopt.getopt(argv, 'i:b:t:c:d:ps:o:l:f:O:D:',
                                    ['ifile=', 'broker=', 'topic=', 'client=', 'device=', 'print',
-                                    'sleep=', 'offset=', 'limit=', 'filename=', 'days_offset='])
+                                    'sleep=', 'offset=', 'limit=', 'filename=', 'days_offset=', 'shift_days='])
     except getopt.GetoptError as err:
         # print help information and exit:
         print(str(err))  # will print something like "option -a not recognized"
@@ -255,6 +257,7 @@ def run(argv):
     offset = SHIFTING_DISTANCE
     max_offset_days = DEFAULT_OFFSET_DAYS
     coord_limit = None
+    shift_days = DEFAULT_SHIFT_DAYS
 
     # parse all command line options into variables
     for opt, arg in opts:
@@ -288,8 +291,10 @@ def run(argv):
                 sys.exit("Seed limit argument [-l]/[--limit] must be an integer. Exit.")
         elif opt in ('-f', '--filename'):
             save_filename = str(arg) + ".log"
-        elif opt in '--days_offset':
+        elif opt in ('-O', '--days_offset'):
             max_offset_days = float(arg)
+        elif opt in ('-D', '--shift_days'):
+            shift_days = float(arg)
 
     # Create a coordinate picker using a file containing coordinates as seeds
     op_handler = OverpassHandler(coordinate_filename, coord_limit)
@@ -318,7 +323,7 @@ def run(argv):
 
     while True:
         """Loop to continuously create and publish requests."""
-        req = travel_request_creator.create_random_request(offset, max_offset_days)
+        req = travel_request_creator.create_random_request(offset, max_offset_days, shift_days)
         save_request(req, save_filename)
         client.publish(topic, req.to_json())
         last_id = req.get_id()
@@ -413,7 +418,7 @@ def resend_from_logfile(argv):
                 line = line.split('::', 1)[1]  # split number away
                 line = os.linesep.join([s for s in line.splitlines() if s])  # remove empty lines
                 client.publish(topic, line)
-                last_id = i+1
+                last_id = i + 1
                 client.loop_start()
 
                 if do_print:
