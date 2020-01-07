@@ -44,6 +44,8 @@ pip3 install -r requirements.txt
 ```
 If this command completes successfully, the correct versions of all necessary dependencies should be installed on your system.  
 
+Otherwise you can check [the requirements](requirements.txt) and try to manually install any missing dependencies.
+
 **Install Tkinter:**  
 
 Tkinter is a Python framework for user interfaces. 
@@ -70,12 +72,47 @@ python3 -m datagenerator --help
 ```
 The result should look like this:  
 
-![command line help](readme/datagenerator_help.png)
-## The data generator is written in Python
+![command line help](readme/datagenerator_help.png)  
 
-The following packages are required:
-- Spaceholder A --version 1.2
-- Spaceholder B --version 1.0
+Now the parameters listed in this list might seem a bit cryptic if you are not familiar of 
+how it creates and emits travel requests. 
+
+So let's quickly explain all these options and shed some light on what they do:
+* The first optional argument just prints the help statement you see in the screenshot
+* The next parameter is used to select a file with coordinates. This is option can be used 
+to seed the coordinate generator used for the requests. It randomly picks from the provided locations.
+* BROKER specifies the address of the broker
+* TOPIC sets the topic the emitter will publish to
+* CLIENT sets the MQTT client's name
+* The print option can be used to print the emitted messages in the commandline
+* SLEEP sets how long the emitter will wait between emitting two requests. 
+This can be used to set the load on the system.
+* OFFSET is used to adjust another dimension of randomness in the generated coordinates.
+Each coordinate is created at a random location in a circle with radius OFFSET 
+around the currently selected seed. 
+* LIMIT defines how many coordinates from the list of seed coordinates are used. 
+This can be used to create random clusters by setting a low value.
+* FILENAME is the output file for logs produced while running the generator
+* DAYS_OFFSET sets the number of days the randomly produced timestamp can be 
+before or after the current daytime.
+* The **resend** option can be used to replay messages from a logfile instead of creating new ones.
+* The final option can be used to create requests at any arbitrary point in time by shifting
+all request DAYS into the past (give negative days for the future) 
+
+### Example
+
+You could for example run the emitter with the following command:
+```bash
+python3 -m datagenerator -p -t example -s 1 -D 50
+```
+This will run an emitter using mostly the default values. 
+It will print the emitted messages to the command line, 
+publish on the topic "example", wait 1 second between messages, 
+and date back the requests by 50 days.  
+
+The output of this command should look something like this:  
+
+![emitter example](readme/datagenerator_example.png)
 
 ## Support
 
