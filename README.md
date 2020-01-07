@@ -68,7 +68,9 @@ To get an idea of the available parameters, ask for help using the flag -h or --
 ```bash
 python3 -m datagenerator --help
 ```
+The result should look like this:  
 
+![command line help](readme/datagenerator_help.png =400x)
 ## The data generator is written in Python
 
 The following packages are required:
