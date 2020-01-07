@@ -70,7 +70,7 @@ python3 -m datagenerator --help
 ```
 The result should look like this:  
 
-![command line help](readme/datagenerator_help.png =400x)
+![command line help](readme/datagenerator_help.png)
 ## The data generator is written in Python
 
 The following packages are required:
